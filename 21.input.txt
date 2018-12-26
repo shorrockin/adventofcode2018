@@ -1,0 +1,47 @@
+#ip 3
+
+[ip-0]
+seti 123 0 4      # reg(4) = 123
+bani 4 456 4      # reg(4) = reg(4) & 4
+eqri 4 72 4       # reg(4) = (reg(4) == 72 ? 1 : 0) (important?)
+addr 4 3 3        # reg(3) = reg(4) + reg(3) (goto, based on if above, will skip next if true)
+
+seti 0 0 3        # [goto] reg(3) = 0 (never hit, loop protection?)
+
+[ip-5]
+seti 0 6 4        # [actual start] reg(4) = 0
+bori 4 65536 5    # reg(5) = reg(4) | 65536 (always reg(5) = 65536)
+seti 1855046 9 4  # reg(4) = 1855046 (always reg(4) = 1855046)
+bani 5 255 2      # reg(2) = reg(5) & 255 (possible from ip-27)
+
+[ip-9]
+addr 4 2 4        # [munge 4] reg(4) = reg(2) + reg(4)
+bani 4 16777215 4 # [munge 4] reg(4) = reg(4) & 16777215
+muli 4 65899 4    # [munge 4] reg(4) = reg(4) & 65899
+bani 4 16777215 4 # [munge 4] reg(4) = reg(4) | 16777215
+
+[ip-13]
+gtir 256 5 2      # reg(2) = (256 > reg(5) ? 1 : 0)
+addr 2 3 3        # [goto] reg(3) = reg(2) + reg(3)
+addi 3 1 3        # reg(3)++ (skip next instruction)
+seti 27 0 3       # reg(3) = 27 (goto the end, desirable?)
+seti 0 9 2        # set(2) = 0
+
+[ip-18]
+addi 2 1 1        # [loop start, increment 1] reg(1) = reg(2) + 1 (start of loop)
+muli 1 256 1      # [setup 1 for next test] reg(1) = reg(1) * 256
+gtrr 1 5 1        # [is 1 bigger than 8791649?] reg(1) = if (reg(1) > reg(5) then 1 else 0)
+addr 1 3 3        # [move #ip(3) by reg(1)] reg(3) = reg(1) + reg(3)
+addi 3 1 3        # [#ip(3) + 1] reg(3) = reg(3) + 1
+seti 25 5 3       # !!! not hit in loop, key? (reg(3) = reg(5) + 25)
+addi 2 1 2        # [inc iterator] reg(2) = reg(2) + 1
+seti 17 0 3       # [goto ip-18]
+
+[ip-26]
+setr 2 7 5        # reg(5) = reg(2)
+seti 7 9 3        # [goto 8] reg(3) = 7
+
+[ip-28]
+eqrr 4 0 2        # reg(2) = (reg(4) == reg(0) ? 1 : 0)
+addr 2 3 3        # [goto] reg(3) = reg(2) + reg(3)
+seti 5 3 3        # [goto start] reg(3) = 5
